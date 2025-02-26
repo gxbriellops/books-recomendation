@@ -14,8 +14,11 @@ def star_print(star):
     else:
         st.text(star_moji * star)
 
+st.set_page_config(
+    page_title='ReadNear'
+)
 
-st.header('Meu primeiro webapp usando Machine Learning')
+st.header('ReadNear - Recomendação de Livros usando Machine Learning 🤖')
 model = pickle.load(open('artefatos/model.pkl', 'rb'))
 book_name = pickle.load(open('artefatos/book_name.pkl', 'rb'))
 book_pivot = pickle.load(open('artefatos/book_pivot.pkl', 'rb'))
@@ -23,9 +26,24 @@ final_data = pickle.load(open('artefatos/final_data.pkl', 'rb'))
 df = pd.read_csv('archive/final_data.csv')
 st.write(' ')
 
-st.subheader('Os mais vendidos')
+st.header('Recomendações de Livros 📚')
 
-cinco_mais_vendidos = df.sort_values(by='rating', ascending=False).head(5).sort_values(by='num_rating', ascending=False)
+# classicos mais vendidos
+five_classics = df[(df['year'] <= 1990) & (df['num_rating'] >= 100) & (df['image_url'].notna()) & (df['image_url'] != ' ')].sort_values(by=['rating', 'num_rating'], ascending=[False, False]).drop_duplicates(subset='title')
+five_classics = five_classics.head()
+
+# autores com livros mais publicados
+# autores com livros mais publicados
+five_most_populars_authors = df.drop_duplicates(subset='title')
+five_most_populars_authors = five_most_populars_authors.groupby('author').agg({'title': 'count', 'num_rating': 'sum'}).reset_index()
+five_most_populars_authors.rename(columns={'title': 'book_count', 'num_rating': 'total_ratings'}, inplace=True)
+five_most_populars_authors = five_most_populars_authors.sort_values(by=['book_count', 'total_ratings'], ascending=[False, False]).head(5)
+
+st.subheader('Os mais vendidos 🏆')
+
+cinco_mais_vendidos = df.sort_values(by=['num_rating', 'rating'], ascending=[False, False]).drop_duplicates(subset='title')
+
+# pega as informações e guardas nas listas
 titles = []
 urls = []
 stars = []
@@ -43,6 +61,7 @@ for index, row in cinco_mais_vendidos.iterrows():
 
 books_cols = st.columns(5)
 
+# aqui exibe os livros mais vendidos
 for i in range(5):
     with books_cols[i]:
         st.image(urls[i], width=300)
@@ -50,7 +69,26 @@ for i in range(5):
         star_print(stars[i])
         st.caption(f'{num_ratings[i]} avaliações')
 
+# exibindo os classicos mais vendidos
+st.subheader('Os mais avaliados da decada de 90📅')
+classicos_cols = st.columns(5)
+for i, (index_c, row_c) in enumerate(five_classics.iterrows()):
+    with classicos_cols[i]:  # Agora usa `i`, que sempre está dentro do intervalo de 0 a 4
+        st.image(row_c['image_url'])
+        st.text(row_c['title'])
+        star_print(row_c['rating'])
+        st.caption(f'{row_c['num_rating']} avaliações')
+
+# exibindo os autores com mais livros
+st.subheader('Os 5 autores mais lidos. ✍️')
+author_cols = st.columns(5)
+for i, (index_a, row_a) in enumerate(five_most_populars_authors.iterrows()):
+    with author_cols[i]:
+        st.text(f'{row_a['author']} com {row_a['book_count']} e um total de {row_a['total_ratings']} avaliações.')
+
 st.divider()
+
+st.subheader('5 livros recomendados com base em um título 📚')
 
 selected_book = st.selectbox(
     'Escolha um livro',
@@ -83,6 +121,7 @@ def recomendation(title):
     for book_id in suggestions[0]:  # Acessar a primeira linha de sugestões
         book_list.append(book_pivot.index[book_id])
     return book_list, poster_url
+
 
 if st.button('Mostrar Recomendações'):
     recomendation_books, poster_url = recomendation(selected_book)
