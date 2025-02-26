@@ -5,10 +5,20 @@ import pandas as pd
 from math import floor
 
 def star_print(star):
+    """
+    Displays a star rating using star emojis.
+
+    Args:
+        star (float): The original star rating, typically out of 10. 
+                      It will be halved and floored to determine the number of star emojis to display.
+
+    The function uses Streamlit to display the rating as star emojis. If the computed star rating is 0, 
+    a blank space is displayed instead.
+    """
+
     no_star = ' '
     star_moji = '⭐'
-    star = star / 2
-    star = floor(star)
+    star = floor(star / 2)
     if star == 0:
         st.text(no_star)
     else:
@@ -18,7 +28,10 @@ st.set_page_config(
     page_title='ReadNear'
 )
 
+# page tittle
 st.header('ReadNear - Recomendação de Livros usando Machine Learning 🤖')
+
+# loading data of models e original databooks
 model = pickle.load(open('artefatos/model.pkl', 'rb'))
 book_name = pickle.load(open('artefatos/book_name.pkl', 'rb'))
 book_pivot = pickle.load(open('artefatos/book_pivot.pkl', 'rb'))
