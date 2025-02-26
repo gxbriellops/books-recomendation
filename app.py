@@ -51,78 +51,6 @@ final_data = data['final_data']
 # load the df to show some recommendations manually
 df = pd.read_csv('archive/final_data.csv')
 
-st.write(' ')
-
-# main head
-st.header('Recomendações de Livros 📚')
-st.write(' ')
-
-# filtering best-selling books
-cinco_mais_vendidos = df.sort_values(by=['num_rating', 'rating'], ascending=[False, False]).drop_duplicates(subset='title')
-
-# filtering best-selling classics
-five_classics = df[(df['year'] <= 1990) & (df['num_rating'] >= 100) & (df['image_url'].notna()) & (df['image_url'] != ' ')].sort_values(by=['rating', 'num_rating'], ascending=[False, False]).drop_duplicates(subset='title')
-five_classics = five_classics.head()
-
-# filtering authors with most published books
-five_most_populars_authors = df.drop_duplicates(subset='title')
-five_most_populars_authors = five_most_populars_authors.groupby('author').agg({'title': 'count', 'num_rating': 'sum'}).reset_index()
-five_most_populars_authors.rename(columns={'title': 'book_count', 'num_rating': 'total_ratings'}, inplace=True)
-five_most_populars_authors = five_most_populars_authors.sort_values(by=['book_count', 'total_ratings'], ascending=[False, False]).head(5)
-
-# subhead 1
-st.subheader('Os mais vendidos 🏆')
-st.write(' ')
-
-# pega as informações e guardas nas listas
-titles = cinco_mais_vendidos['title'].tolist()
-urls = cinco_mais_vendidos['image_url'].tolist()
-stars = cinco_mais_vendidos['rating'].tolist()
-num_ratings = cinco_mais_vendidos['num_rating'].tolist()
-
-books_cols = st.columns(5)
-
-# aqui exibe os livros mais vendidos
-for i in range(5):
-    with books_cols[i]:
-        st.image(urls[i], width=300)
-        st.text(titles[i])
-        star_print(stars[i])
-        st.caption(f'{num_ratings[i]} avaliações')
-st.write(' ')
-
-# exibindo os classicos mais vendidos
-st.subheader('Os mais avaliados da decada de 90📅')
-st.write(' ')
-
-classicos_cols = st.columns(5)
-for i, (index_c, row_c) in enumerate(five_classics.iterrows()):
-    with classicos_cols[i]:  # Agora usa `i`, que sempre está dentro do intervalo de 0 a 4
-        st.image(row_c['image_url'])
-        st.text(row_c['title'])
-        star_print(row_c['rating'])
-        st.caption(f'{row_c['num_rating']} avaliações')
-st.write(' ')
-
-# exibindo os autores com mais livros
-st.subheader('Os 5 autores mais lidos. ✍️')
-author_cols = st.columns(5)
-for i, (index_a, row_a) in enumerate (five_most_populars_authors.iterrows()):
-    with author_cols[i]:
-        st.markdown(f"**{row_a['author']}**  \n"
-                    f"📚 {row_a['book_count']} livros  \n"
-                    f"⭐ {row_a['total_ratings']} avaliações")
-st.write(' ')
-
-st.divider()
-
-st.subheader('5 livros recomendados com base em um título 📚')
-
-selected_book = st.selectbox(
-    'Escolha um livro',
-    book_name
-)   
-
 def fecth_poster(sugestions):
     """
     Fetches the poster URLs for a list of book suggestions.
@@ -173,6 +101,13 @@ def recomendation(title):
         book_list.append(book_pivot.index[book_id])
     return book_list, poster_url
 
+# main head
+st.divider()
+st.subheader('5 livros recomendados com base em um título 📚')
+selected_book = st.selectbox(
+    'Escolha um livro',
+    book_name
+)   
 
 if st.button('Mostrar Recomendações'):
     with st.spinner('Procurando recomendações'):
@@ -188,3 +123,60 @@ if st.button('Mostrar Recomendações'):
                     n_avaliacoes_rec = book_info['num_rating'].values[0]
                     star_print(star_rec)
                     st.caption(f'{n_avaliacoes_rec} avaliações')
+st.write(' ')
+
+# filtering best-selling books
+cinco_mais_vendidos = df.sort_values(by=['num_rating', 'rating'], ascending=[False, False]).drop_duplicates(subset='title')
+
+# filtering best-selling classics
+five_classics = df[(df['year'] <= 1990) & (df['num_rating'] >= 100) & (df['image_url'].notna()) & (df['image_url'] != ' ')].sort_values(by=['rating', 'num_rating'], ascending=[False, False]).drop_duplicates(subset='title')
+five_classics = five_classics.head()
+
+# filtering authors with most published books
+five_most_populars_authors = df.drop_duplicates(subset='title')
+five_most_populars_authors = five_most_populars_authors.groupby('author').agg({'title': 'count', 'num_rating': 'sum'}).reset_index()
+five_most_populars_authors.rename(columns={'title': 'book_count', 'num_rating': 'total_ratings'}, inplace=True)
+five_most_populars_authors = five_most_populars_authors.sort_values(by=['book_count', 'total_ratings'], ascending=[False, False]).head(5)
+
+# subhead 1
+st.subheader('Livros mais vendidos 🏆')
+st.write(' ')
+
+# pega as informações e guardas nas listas
+titles = cinco_mais_vendidos['title'].tolist()
+urls = cinco_mais_vendidos['image_url'].tolist()
+stars = cinco_mais_vendidos['rating'].tolist()
+num_ratings = cinco_mais_vendidos['num_rating'].tolist()
+
+books_cols = st.columns(5)
+
+# aqui exibe os livros mais vendidos
+for i in range(5):
+    with books_cols[i]:
+        st.image(urls[i], width=300)
+        st.text(titles[i])
+        star_print(stars[i])
+        st.caption(f'{num_ratings[i]} avaliações')
+st.write(' ')
+
+# exibindo os classicos mais vendidos
+st.subheader('Os mais avaliados da decada de 90📅')
+st.write(' ')
+
+classicos_cols = st.columns(5)
+for i, (index_c, row_c) in enumerate(five_classics.iterrows()):
+    with classicos_cols[i]:  # Agora usa `i`, que sempre está dentro do intervalo de 0 a 4
+        st.image(row_c['image_url'])
+        st.text(row_c['title'])
+        star_print(row_c['rating'])
+        st.caption(f'{row_c['num_rating']} avaliações')
+st.write(' ')
+
+# exibindo os autores com mais livros
+st.subheader('Os 5 autores mais lidos. ✍️')
+author_cols = st.columns(5)
+for i, (index_a, row_a) in enumerate (five_most_populars_authors.iterrows()):
+    with author_cols[i]:
+        st.markdown(f"**{row_a['author']}**  \n"
+                    f"📚 {row_a['book_count']} livros  \n"
+                    f"⭐ {row_a['total_ratings']} avaliações")
