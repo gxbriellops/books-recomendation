@@ -138,38 +138,40 @@ five_most_populars_authors = five_most_populars_authors.groupby('author').agg({'
 five_most_populars_authors.rename(columns={'title': 'book_count', 'num_rating': 'total_ratings'}, inplace=True)
 five_most_populars_authors = five_most_populars_authors.sort_values(by=['book_count', 'total_ratings'], ascending=[False, False]).head(5)
 
-# subhead 1
-st.subheader('Livros mais vendidos 🏆')
-st.write(' ')
 
-# pega as informações e guardas nas listas
-titles = cinco_mais_vendidos['title'].tolist()
-urls = cinco_mais_vendidos['image_url'].tolist()
-stars = cinco_mais_vendidos['rating'].tolist()
-num_ratings = cinco_mais_vendidos['num_rating'].tolist()
 
-books_cols = st.columns(5)
+tab1, tab2 = st.tabs(['Mais vendidos', 'Clássicos'])
 
-# aqui exibe os livros mais vendidos
-for i in range(5):
-    with books_cols[i]:
-        st.image(urls[i], width=300)
-        st.text(titles[i])
-        star_print(stars[i])
-        st.caption(f'{num_ratings[i]} avaliações')
-st.write(' ')
+with tab1:
+    st.subheader('Livros mais vendidos 🏆')
+    books_cols = st.columns(5)
+    # pega as informações e guardas nas listas
+    titles = cinco_mais_vendidos['title'].tolist()
+    urls = cinco_mais_vendidos['image_url'].tolist()
+    stars = cinco_mais_vendidos['rating'].tolist()
+    num_ratings = cinco_mais_vendidos['num_rating'].tolist()
+    # subhead 1
+    st.write(' ')
+    # aqui exibe os livros mais vendidos
+    for i in range(5):
+        with books_cols[i]:
+            st.image(urls[i], width=300)
+            st.text(titles[i])
+            star_print(stars[i])
+            st.caption(f'{num_ratings[i]} avaliações')
+with tab2:
+    # exibindo os classicos mais vendidos
+    st.subheader('Os mais avaliados da decada de 90📅')
+    st.write(' ')
 
-# exibindo os classicos mais vendidos
-st.subheader('Os mais avaliados da decada de 90📅')
-st.write(' ')
+    classicos_cols = st.columns(5)
+    for i, (index_c, row_c) in enumerate(five_classics.iterrows()):
+        with classicos_cols[i]:  # Agora usa `i`, que sempre está dentro do intervalo de 0 a 4
+            st.image(row_c['image_url'])
+            st.text(row_c['title'])
+            star_print(row_c['rating'])
+            st.caption(f'{row_c['num_rating']} avaliações')
 
-classicos_cols = st.columns(5)
-for i, (index_c, row_c) in enumerate(five_classics.iterrows()):
-    with classicos_cols[i]:  # Agora usa `i`, que sempre está dentro do intervalo de 0 a 4
-        st.image(row_c['image_url'])
-        st.text(row_c['title'])
-        star_print(row_c['rating'])
-        st.caption(f'{row_c['num_rating']} avaliações')
 st.write(' ')
 
 # exibindo os autores com mais livros
