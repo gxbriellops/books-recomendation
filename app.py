@@ -25,17 +25,28 @@ def star_print(star):
         st.text(star_moji * star)
 
 st.set_page_config(
-    page_title='ReadNear'
+    page_title='ReadNear',
+    page_icon='📚'
 )
 
 # page tittle
 st.header('ReadNear - Recomendação de Livros usando Machine Learning 🤖')
 
 # loads the model and some data processed from a previous analysis
-model = pickle.load(open('artefatos/model.pkl', 'rb'))
-book_name = pickle.load(open('artefatos/book_name.pkl', 'rb'))
-book_pivot = pickle.load(open('artefatos/book_pivot.pkl', 'rb'))
-final_data = pickle.load(open('artefatos/final_data.pkl', 'rb'))
+@st.cache_data
+def load_data():
+    return {
+        'model': pickle.load(open('artefatos/model.pkl', 'rb')),
+        'book_name': pickle.load(open('artefatos/book_name.pkl', 'rb')),
+        'book_pivot': pickle.load(open('artefatos/book_pivot.pkl', 'rb')),
+        'final_data': pickle.load(open('artefatos/final_data.pkl', 'rb'))
+    }
+
+data = load_data()
+model = data['model']
+book_name = data['book_name']
+book_pivot = data['book_pivot']
+final_data = data['final_data']
 
 # load the df to show some recommendations manually
 df = pd.read_csv('archive/final_data.csv')
@@ -96,9 +107,11 @@ st.write(' ')
 # exibindo os autores com mais livros
 st.subheader('Os 5 autores mais lidos. ✍️')
 author_cols = st.columns(5)
-for i, (index_a, row_a) in enumerate(five_most_populars_authors.iterrows()):
+for i, (index_a, row_a) in enumerate (five_most_populars_authors.iterrows()):
     with author_cols[i]:
-        st.text(f'{row_a['author']} com {row_a['book_count']} e um total de {row_a['total_ratings']} avaliações.')
+        st.markdown(f"**{row_a['author']}**  \n"
+                    f"📚 {row_a['book_count']} livros  \n"
+                    f"⭐ {row_a['total_ratings']} avaliações")
 st.write(' ')
 
 st.divider()
@@ -162,15 +175,16 @@ def recomendation(title):
 
 
 if st.button('Mostrar Recomendações'):
-    recomendation_books, poster_url = recomendation(selected_book)
-    col_recomdation = st.columns(5)
-    for book_rec in range(5):
-        with col_recomdation[book_rec]:
-            st.image(poster_url[book_rec], width=300)
-            st.text(recomendation_books[book_rec])
-            book_info = final_data.loc[final_data['title'] == recomendation_books[book_rec]]
-            if not book_info.empty:
-                star_rec = book_info['rating'].values[0]
-                n_avaliacoes_rec = book_info['num_rating'].values[0]
-                star_print(star_rec)
-                st.caption(f'{n_avaliacoes_rec} avaliações')
+    with st.spinner('Procurando recomendações'):
+        recomendation_books, poster_url = recomendation(selected_book)
+        col_recomdation = st.columns(5)
+        for book_rec in range(5):
+            with col_recomdation[book_rec]:
+                st.image(poster_url[book_rec], width=300)
+                st.text(recomendation_books[book_rec])
+                book_info = final_data.loc[final_data['title'] == recomendation_books[book_rec]]
+                if not book_info.empty:
+                    star_rec = book_info['rating'].values[0]
+                    n_avaliacoes_rec = book_info['num_rating'].values[0]
+                    star_print(star_rec)
+                    st.caption(f'{n_avaliacoes_rec} avaliações')
