@@ -31,46 +31,43 @@ st.set_page_config(
 # page tittle
 st.header('ReadNear - Recomendação de Livros usando Machine Learning 🤖')
 
-# loading data of models e original databooks
+# loads the model and some data processed from a previous analysis
 model = pickle.load(open('artefatos/model.pkl', 'rb'))
 book_name = pickle.load(open('artefatos/book_name.pkl', 'rb'))
 book_pivot = pickle.load(open('artefatos/book_pivot.pkl', 'rb'))
 final_data = pickle.load(open('artefatos/final_data.pkl', 'rb'))
+
+# load the df to show some recommendations manually
 df = pd.read_csv('archive/final_data.csv')
+
 st.write(' ')
 
+# main head
 st.header('Recomendações de Livros 📚')
+st.write(' ')
 
-# classicos mais vendidos
+# filtering best-selling books
+cinco_mais_vendidos = df.sort_values(by=['num_rating', 'rating'], ascending=[False, False]).drop_duplicates(subset='title')
+
+# filtering best-selling classics
 five_classics = df[(df['year'] <= 1990) & (df['num_rating'] >= 100) & (df['image_url'].notna()) & (df['image_url'] != ' ')].sort_values(by=['rating', 'num_rating'], ascending=[False, False]).drop_duplicates(subset='title')
 five_classics = five_classics.head()
 
-# autores com livros mais publicados
-# autores com livros mais publicados
+# filtering authors with most published books
 five_most_populars_authors = df.drop_duplicates(subset='title')
 five_most_populars_authors = five_most_populars_authors.groupby('author').agg({'title': 'count', 'num_rating': 'sum'}).reset_index()
 five_most_populars_authors.rename(columns={'title': 'book_count', 'num_rating': 'total_ratings'}, inplace=True)
 five_most_populars_authors = five_most_populars_authors.sort_values(by=['book_count', 'total_ratings'], ascending=[False, False]).head(5)
 
+# subhead 1
 st.subheader('Os mais vendidos 🏆')
-
-cinco_mais_vendidos = df.sort_values(by=['num_rating', 'rating'], ascending=[False, False]).drop_duplicates(subset='title')
+st.write(' ')
 
 # pega as informações e guardas nas listas
-titles = []
-urls = []
-stars = []
-num_ratings = []
-
-for index, row in cinco_mais_vendidos.iterrows():
-    book_names = row['title']
-    titles.append(book_names)
-    url = row['image_url']
-    urls.append(url)
-    star = row['rating']
-    stars.append(star)
-    num_rating = row['num_rating']
-    num_ratings.append(num_rating)
+titles = cinco_mais_vendidos['title'].tolist()
+urls = cinco_mais_vendidos['image_url'].tolist()
+stars = cinco_mais_vendidos['rating'].tolist()
+num_ratings = cinco_mais_vendidos['num_rating'].tolist()
 
 books_cols = st.columns(5)
 
@@ -81,9 +78,12 @@ for i in range(5):
         st.text(titles[i])
         star_print(stars[i])
         st.caption(f'{num_ratings[i]} avaliações')
+st.write(' ')
 
 # exibindo os classicos mais vendidos
 st.subheader('Os mais avaliados da decada de 90📅')
+st.write(' ')
+
 classicos_cols = st.columns(5)
 for i, (index_c, row_c) in enumerate(five_classics.iterrows()):
     with classicos_cols[i]:  # Agora usa `i`, que sempre está dentro do intervalo de 0 a 4
@@ -91,6 +91,7 @@ for i, (index_c, row_c) in enumerate(five_classics.iterrows()):
         st.text(row_c['title'])
         star_print(row_c['rating'])
         st.caption(f'{row_c['num_rating']} avaliações')
+st.write(' ')
 
 # exibindo os autores com mais livros
 st.subheader('Os 5 autores mais lidos. ✍️')
@@ -98,6 +99,7 @@ author_cols = st.columns(5)
 for i, (index_a, row_a) in enumerate(five_most_populars_authors.iterrows()):
     with author_cols[i]:
         st.text(f'{row_a['author']} com {row_a['book_count']} e um total de {row_a['total_ratings']} avaliações.')
+st.write(' ')
 
 st.divider()
 
@@ -109,6 +111,17 @@ selected_book = st.selectbox(
 )   
 
 def fecth_poster(sugestions):
+    """
+    Fetches the poster URLs for a list of book suggestions.
+
+    Args:
+        sugestions (list of lists): A list containing a single sublist of book indices 
+                                    that are suggested as similar or recommended.
+
+    Returns:
+        list: A list of URLs corresponding to the posters of the suggested books.
+    """
+
     book_name = []
     id_book = []
     poster_url = []
@@ -127,6 +140,18 @@ def fecth_poster(sugestions):
     return poster_url
 
 def recomendation(title):
+    """
+    Receives a book title and returns a list of 5 books that are similar to it, 
+    along with their respective poster URLs.
+
+    Args:
+        title (str): The title of the book.
+
+    Returns:
+        tuple: A tuple containing two lists. The first list contains the titles of 
+        the 5 recommended books, and the second list contains the URLs of the posters 
+        of those books.
+    """
     book_list = []
     book_id = np.where(book_pivot.index == title)[0][0]
     distance, suggestions = model.kneighbors(book_pivot.iloc[book_id,:].values.reshape(1, -1), n_neighbors=6)
