@@ -15,7 +15,7 @@ O propósito deste projeto é criar um sistema que recomenda livros de forma per
 
 ## Dados Utilizados
 
-O modelo foi construído com base em um banco de dados de avaliações de livros obtido do **Kaggle**. [O link para o dataset será adicionado aqui posteriormente](https://www.kaggle.com/datasets/saurabhbagchi/books-dataset/data).
+O modelo foi construído com base em um banco de dados de avaliações de livros obtido do **Kaggle**. [O link para o dataset](https://www.kaggle.com/datasets/saurabhbagchi/books-dataset/data).
 
 ## Tecnologias
 
