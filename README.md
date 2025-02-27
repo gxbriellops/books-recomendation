@@ -33,7 +33,7 @@ O projeto utiliza as seguintes tecnologias e bibliotecas:
 
 O sistema é disponibilizado por meio de um **webapp** desenvolvido com **Streamlit**, uma biblioteca amplamente utilizada na área de dados para criar aplicativos interativos de forma simples e com deploy fácil. Para acessar o aplicativo, visite: [read-near.streamlit.app](https://read-near.streamlit.app).
 
-**Nota**: O Streamlit pode hibernar o aplicativo devido a poucos acessos, uma medida para reduzir a carga no servidor. Caso esteja hibernado, pode ser necessário esperar alguns minutos para que ele seja reativado.
+**Nota**: O Streamlit pode hibernar o aplicativo devido a poucos acessos, uma medida para reduzir a carga no servidor. Caso esteja hibernado, seria necessário que eu reative manualmente.
 
 ## Status do Projeto
 
