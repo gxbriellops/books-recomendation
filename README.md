@@ -2,7 +2,7 @@
 
 Este projeto implementa um sistema de recomendação de livros utilizando o algoritmo **K-Nearest Neighbors (KNN)** com **filtragem colaborativa**. O objetivo é recomendar livros a partir de um título escolhido pelo usuário, utilizando as avaliações de outros usuários para sugerir opções relevantes.
 
-![Dashboad Preview]()
+![Dashboad Preview](https://github.com/gxbriellops/books-recomendation/blob/main/Desktop-2025.02.27-14.57.01.01.gif)
 
 ## Objetivo do Projeto
 
