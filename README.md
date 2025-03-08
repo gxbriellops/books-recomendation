@@ -2,6 +2,8 @@
 
 Este projeto implementa um sistema de recomendação de livros utilizando o algoritmo **K-Nearest Neighbors (KNN)** com **filtragem colaborativa**. O objetivo é recomendar livros a partir de um título escolhido pelo usuário, utilizando as avaliações de outros usuários para sugerir opções relevantes.
 
+![Dashboad Preview]()
+
 ## Objetivo do Projeto
 
 O propósito deste projeto é criar um sistema que recomenda livros de forma personalizada. O usuário escolhe um título de livro, e o modelo, com base nas avaliações de outros usuários, sugere outros livros que façam sentido, utilizando técnicas de **filtragem colaborativa**.
